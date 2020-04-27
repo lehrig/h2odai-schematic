@@ -133,6 +133,21 @@ resource "ibm_is_security_group_rule" "sg3-tcp-rule" {
   }
 }
 
+#Enable port 12345 - DAI default port
+resource "ibm_is_security_group_rule" "sg4-tcp-rule" {
+  depends_on = [
+    "ibm_is_floating_ip.fip1"
+  ]
+  group = "${ibm_is_vpc.vpc.default_security_group}"
+  direction = "inbound"
+  remote = "0.0.0.0/0"
+
+  tcp {
+    port_min = 12345
+    port_max = 12345
+  }
+}
+
 resource "ibm_is_instance" "vm" {
   name = "${var.vpc_basename}-vm1"
   image = "${data.ibm_is_image.bootimage.id}"
