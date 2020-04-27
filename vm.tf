@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "dai_image_url" {
+  description = "URL to DAI docker images for PPC"
+  default = "https://s3.amazonaws.com/artifacts.h2o.ai/releases/ai/h2o/dai/rel-1.8.5-64/ppc64le-centos7/dai-docker-centos7-ppc64le-1.8.5.1-10.0.tar.gz"
+}
 
 variable "vision_version" {
   description = "V.R.M.F of IBM Visual Insights"
@@ -21,11 +25,6 @@ variable "vision_version" {
 variable "vpc_basename" {
   description = "Denotes the name of the VPC that IBM Visual Insights will be deployed into. Resources associated with IBM Visual Insights will be prepended with this name. Keep this at 25 characters or fewer."
   default = "ibm-visual-insights-trial"
-}
-
-variable "cos_bucket_base" {
-  description = "HTTP URL for COS bucket containing install media (e.g. http://region/bucket with no trailing slash)"
-  default = "https://vision-cloud-trial.s3.direct.us-east.cloud-object-storage.appdomain.cloud"
 }
 
 variable "vision_deb_name" {
@@ -207,9 +206,7 @@ resource "null_resource" "provisioners" {
 export RAMDISK=/tmp/ramdisk
 export DOCKERMOUNT=/var/lib/docker
 export USERMGTIMAGE=vision-usermgt:${var.vision_version}
-export COS_BUCKET_BASE=${var.cos_bucket_base}
-export URLPAIVIMAGES="$${COS_BUCKET_BASE}/${var.vision_tar_name}"
-export URLPAIVDEB="$${COS_BUCKET_BASE}/${var.vision_deb_name}"
+export URLDAIDOCKERMAGES=${var.dai_image_url}
 ENDENVTEMPL
     destination = "/tmp/scripts/env.sh"
     connection {
@@ -230,14 +227,13 @@ ENDENVTEMPL
       "/tmp/scripts/ramdisk_docker_create.sh",
       "/tmp/scripts/wait_bootfinished.sh",
       "/tmp/scripts/install_gpu_drivers.sh",
-      "/tmp/scripts/fetch_vision.sh",
+      "/tmp/scripts/fetch_dai.sh",
       "/tmp/scripts/install_docker.sh",
       "/tmp/scripts/install_nvidiadocker2.sh",
-      "/tmp/scripts/install_vision.sh",
+      "/tmp/scripts/install_dai.sh",
       "/tmp/scripts/patch_postinstall.sh",
       "/tmp/scripts/ramdisk_tmp_destroy.sh",
-      "/tmp/scripts/vision_start.sh",
-      "/tmp/scripts/set_vision_pw.sh ${random_password.vision_password.result}",
+      "/tmp/scripts/dai_start.sh",
       "rm -rf /tmp/scripts"
     ]
     connection {
