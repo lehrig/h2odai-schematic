@@ -13,7 +13,7 @@ More specifically, it creates the following resources:
 * a Subnet
 * a Virtual Server Instance within the VPC and a particular region and availability zone (AZ)
 * a floating IP (FIP) address on the public Internet
-* a security group that allows ingress traffic on port 443 (SSL) and on port 22 (for debug)
+* a security group that allows ingress traffic on port 22 (for debug), on port 443 (SSL), and on port 12345 (H2O.ai DAI)
 
 IMPORTANT: Reboots of the VM are not supported, and will result in loss of data. Back up any datasets or models prior to a reboot or shutdown of underlying VPC infrastructure.
 
