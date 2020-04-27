@@ -3,7 +3,7 @@ By deploying this terraform template via IBM Cloud Schematics or via Terraform, 
 
 ## Deployment Architecture
 
-This provisions a dedicated instance of H2O.ai Driverless AI in IBM Cloud utilizing IBM Cloud Schematics or with standalone Terraform.
+This provisions a dedicated instance of H2O.ai Driverless AI in IBM Cloud utilizing IBM Cloud Schematics or with standalone Terraform. It follows http://docs.h2o.ai/driverless-ai/latest-stable/docs/userguide/install/ibm-docker.html#install-on-ibm-with-gpus.
 
 Once created, its public IP address along with a username and password to log into the application will be displayed for easy access.
 
