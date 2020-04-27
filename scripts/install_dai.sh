@@ -17,8 +17,17 @@ BASEDIR="$(dirname "$0")"
 # shellcheck disable=SC1090
 source ${BASEDIR}/env.sh
 
-dpkg -i ${RAMDISK}/*trial*.deb
-LOGFILE=/opt/ibm/vision/install_vision.log
-echo "INFO: Loading IBM Visual Insights Docker images. This will take several minutes..."
-time /opt/ibm/vision/bin/load_images.sh -f ${RAMDISK}/visual-insights-images-*.tar &>${LOGFILE}
-echo "INFO: IBM Visual Insights Docker images loaded successfully!"
+echo "INFO: Set up installation directory (/opt/h2o/)"
+mkdir /opt/h2o/
+cd /opt/h2o/
+
+echo "INFO: Load the Driverless AI docker image"
+docker load < ${RAMDISK}/dai-docker-centos7-ppc64le-*.tar.gz
+
+echo "INFO: Set up the data, log, license, and tmp directories on the host machine"
+mkdir data
+mkdir log
+mkdir license
+mkdir tmp
+
+echo "INFO: H2O.ai Driverless AI installed successfully!"
