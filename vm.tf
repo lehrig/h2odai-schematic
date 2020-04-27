@@ -17,24 +17,19 @@ variable "dai_image_url" {
   default = "https://s3.amazonaws.com/artifacts.h2o.ai/releases/ai/h2o/dai/rel-1.8.5-64/ppc64le-centos7/dai-docker-centos7-ppc64le-1.8.5.1-10.0.tar.gz"
 }
 
-variable "vision_version" {
-  description = "V.R.M.F of IBM Visual Insights"
-  default = "1.2.0.0"
+variable "dai_version" {
+  description = "DAI Version"
+  default = "1.8.5.1"
 }
 
 variable "vpc_basename" {
-  description = "Denotes the name of the VPC that IBM Visual Insights will be deployed into. Resources associated with IBM Visual Insights will be prepended with this name. Keep this at 25 characters or fewer."
-  default = "ibm-visual-insights-trial"
+  description = "Denotes the name of the VPC that DAI will be deployed into. Resources associated with DAI will be prepended with this name. Keep this at 25 characters or fewer."
+  default = "h2o-dai-trial"
 }
 
-variable "vision_deb_name" {
-  description = "Install debian name (e.g. visual-insights_1.x.y.deb )"
-  default = "visual-insights_1.2.0.0-508.bfb5f12~trial_ppc64el.deb"
-}
-
-variable "vision_tar_name" {
-  description = "Install images name (e.g. visual-insights-images-1.x.y.0.tar)"
-  default = "visual-insights-images-1.2.0.0.tar"
+variable "dai_tar_name" {
+  description = "Install images name (e.g. dai-docker-centos7-ppc64le-1.8.5.1-10.0.tar.gz)"
+  default = "dai-docker-centos7-ppc64le-1.8.5.1-10.0.tar.gz"
 }
 
 variable "boot_image_name" {
@@ -43,12 +38,12 @@ variable "boot_image_name" {
 }
 
 variable "vpc_region" {
-  description = "Target region to create this instance of IBM Visual Insights. Valid values are 'us-south' only at this time."
+  description = "Target region to create this instance of DAI. Valid values are 'us-south' only at this time."
   default = "us-south"
 }
 
 variable "vpc_zone" {
-  description = "Target availbility zone to create this instance of IBM Visual Insights. Valid values are 'us-south-1' 'us-south-2' or 'us-south-3' at this time."
+  description = "Target availbility zone to create this instance of DAI. Valid values are 'us-south-1' 'us-south-2' or 'us-south-3' at this time."
   default = "us-south-2"
 }
 
@@ -83,7 +78,7 @@ resource "ibm_is_subnet" "subnet" {
 #Create an SSH key which will be used for provisioning by this template, and for debug purposes
 resource "ibm_is_ssh_key" "public_key" {
   name = "${var.vpc_basename}-public-key"
-  public_key = "${tls_private_key.vision_keypair.public_key_openssh}"
+  public_key = "${tls_private_key.dai_keypair.public_key_openssh}"
 }
 
 #Create a public floating IP so that the app is available on the Internet
@@ -161,15 +156,8 @@ resource "ibm_is_instance" "vm" {
 
 }
 
-#Create a login password which will be used for the main IBM Visual Insights application
-resource "random_password" "vision_password" {
-  length = 16
-  special = true
-  override_special = "!@_"
-}
-
 #Create a ssh keypair which will be used to provision code onto the system - and also access the VM for debug if needed.
-resource "tls_private_key" "vision_keypair" {
+resource "tls_private_key" "dai_keypair" {
   algorithm = "RSA"
   rsa_bits = "2048"
 }
@@ -195,7 +183,7 @@ resource "null_resource" "provisioners" {
       agent = false
       timeout = "5m"
       host = "${ibm_is_floating_ip.fip1.address}"
-      private_key = "${tls_private_key.vision_keypair.private_key_pem}"
+      private_key = "${tls_private_key.dai_keypair.private_key_pem}"
     }
   }
 
@@ -205,7 +193,6 @@ resource "null_resource" "provisioners" {
 #!/bin/bash -xe
 export RAMDISK=/tmp/ramdisk
 export DOCKERMOUNT=/var/lib/docker
-export USERMGTIMAGE=vision-usermgt:${var.vision_version}
 export URLDAIDOCKERMAGES=${var.dai_image_url}
 ENDENVTEMPL
     destination = "/tmp/scripts/env.sh"
@@ -215,7 +202,7 @@ ENDENVTEMPL
       agent = false
       timeout = "5m"
       host = "${ibm_is_floating_ip.fip1.address}"
-      private_key = "${tls_private_key.vision_keypair.private_key_pem}"
+      private_key = "${tls_private_key.dai_keypair.private_key_pem}"
     }
   }
 
@@ -231,7 +218,6 @@ ENDENVTEMPL
       "/tmp/scripts/install_docker.sh",
       "/tmp/scripts/install_nvidiadocker2.sh",
       "/tmp/scripts/install_dai.sh",
-      "/tmp/scripts/patch_postinstall.sh",
       "/tmp/scripts/ramdisk_tmp_destroy.sh",
       "/tmp/scripts/dai_start.sh",
       "rm -rf /tmp/scripts"
@@ -242,7 +228,7 @@ ENDENVTEMPL
       agent = false
       timeout = "5m"
       host = "${ibm_is_floating_ip.fip1.address}"
-      private_key = "${tls_private_key.vision_keypair.private_key_pem}"
+      private_key = "${tls_private_key.dai_keypair.private_key_pem}"
     }
   }
 }
