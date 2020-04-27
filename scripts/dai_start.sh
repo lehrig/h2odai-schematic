@@ -18,4 +18,4 @@ BASEDIR="$(dirname "$0")"
 source ${BASEDIR}/env.sh
 
 echo "INFO: Start the Driverless AI Docker image with nvidia-docker"
-docker run -d --pid=host --init --rm -u `id -u`:`id -g` -p 12345:12345 -v /opt/h2o/data:/data -v /opt/h2o/log:/log -v /opt/h2o/license:/license  -v /opt/h2o/tmp:/tmp h2oai/dai-centos7-ppc64le:1.8.5-cuda10.0
+docker run -d --pid=host --init --rm -u `id -u`:`id -g` -p 12345:12345 -v /opt/h2o/data:/data -v /opt/h2o/log:/log -v /opt/h2o/license:/license  -v /opt/h2o/tmp:/tmp h2oai/dai-centos7-ppc64le:1.8.5.1-cuda10.0.64
