@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#TODO: Update before next version
-IBM_POWERAI_VISION_LICENSE_ACCEPT=yes /opt/ibm/vision/bin/accept-visual-insights-license.sh
-/opt/ibm/vision/bin/vision-start.sh
+BASEDIR="$(dirname "$0")"
+# shellcheck disable=SC1090
+source ${BASEDIR}/env.sh
 
+echo "INFO: Start the Driverless AI Docker image with nvidia-docker"
+docker run -d --pid=host --init --rm -u `id -u`:`id -g` -p 12345:12345 -v /opt/h2o/data:/data -v /opt/h2o/log:/log -v /opt/h2o/license:/license  -v /opt/h2o/tmp:/tmp h2oai/dai-centos7-ppc64le:1.8.5-cuda10.0
